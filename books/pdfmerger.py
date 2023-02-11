@@ -4,7 +4,7 @@
 import sys
 import time
 import PyPDF2
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from PyPDF2 import PdfReader, PdfWriter
 
 def eprint(*args, **kwargs):
     """Print to stderr
@@ -42,8 +42,8 @@ def main():
     # get PDF files
     for f in filenames:
         try:
-            next_pdf_file = PdfFileReader(open(f, "rb"))
-        except(PyPDF2.utils.PdfReadError):
+            next_pdf_file = PdfReader(open(f, "rb"))
+        except(PyPDF2._utils.PdfStreamError):
             eprint("%s is not a valid PDF file." % f)
             sys.exit(1)
         except(IOError):
@@ -53,14 +53,14 @@ def main():
             files_to_merge.append(next_pdf_file)
 
     # merge page by page
-    output_pdf_stream = PdfFileWriter()
+    output_pdf_stream = PdfWriter()
     j=0
     k=0
     for f in files_to_merge:
-        for i in range(f.numPages):
-            output_pdf_stream.addPage(f.getPage(i))
+        for i in range(len(f.pages)):
+            output_pdf_stream.add_page(f.pages[i])
             if i==0:
-                output_pdf_stream.addBookmark(str(filenames[k]),j)
+                output_pdf_stream.add_outline_item(str(filenames[k]),j)
             j = j + 1
         k += 1
 
